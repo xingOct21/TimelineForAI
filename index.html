@@ -500,17 +500,22 @@ function buildTLData(track, translations) {
       }
     },
     events: src.events.map((e, i) => {
+      const wikiLink = e.wikiUrl
+        ? `<p style="margin-top:8px"><a href="${e.wikiUrl}" target="_blank" rel="noopener" style="font-size:0.8em;opacity:0.55;letter-spacing:1px">Wikipedia ↗</a></p>`
+        : '';
       const ev = {
         start_date: { year: e.year, ...(e.month ? { month: e.month } : {}) },
         text: {
           headline: t[`${i}.headline`] || e.headline,
-          text: `<p>${t[`${i}.text`] || e.text}</p>`
+          text: `<p>${t[`${i}.text`] || e.text}</p>${wikiLink}`
         }
       };
       if (e.img) {
         ev.media = {
           url: e.img,
-          caption: t[`${i}.cap`] || e.imgCaption || ''
+          caption: t[`${i}.cap`] || e.imgCaption || '',
+          link: e.wikiUrl || '',
+          link_target: '_blank'
         };
       }
       return ev;
@@ -527,7 +532,8 @@ function renderTimeline(data) {
   try {
     tlInstance = new TL.Timeline('timeline-embed', data, {
       timenav_position: 'bottom',
-      scale_factor: 2
+      scale_factor: 2,
+      layout: 'landscape'
     });
   } catch (err) {
     console.error('Timeline.js init failed:', err);
