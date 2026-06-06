@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="timeline.css">
+  <script src="timeline.js"></script>
+</head>
+<body style="background:#111;color:#0f0;font-family:monospace;padding:20px">
+  <div id="log"></div>
+  <div id="timeline-embed" style="width:100%;height:600px;margin-top:20px"></div>
+  <script>
+    const log = s => { document.getElementById('log').innerHTML += '<div>' + s + '</div>'; };
+
+    log('1. typeof TL = ' + typeof TL);
+    log('2. typeof TL.Timeline = ' + (typeof TL !== 'undefined' ? typeof TL.Timeline : 'N/A'));
+
+    try {
+      const data = {
+        title: { text: { headline: "测试时间线", text: "<p>最小化测试</p>" } },
+        events: [
+          { start_date: { year: "2020" }, text: { headline: "事件一", text: "<p>这是测试内容</p>" } },
+          { start_date: { year: "2022" }, text: { headline: "事件二", text: "<p>这是测试内容</p>" } }
+        ]
+      };
+      log('3. data built OK');
+      new TL.Timeline('timeline-embed', data);
+      log('4. TL.Timeline() called — SUCCESS');
+    } catch(e) {
+      log('ERROR: ' + e.message);
+      log('STACK: ' + e.stack);
+    }
+  </script>
+</body>
+</html>

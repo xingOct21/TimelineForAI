@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI · ML · DL 简史</title>
+  <link rel="stylesheet" href="timeline.css">
+  <script src="timeline.js"></script>
+  <script src="data.js"></script>
+  <style>
+    /* ── Variables ── */
+    :root {
+      --bg:      #07070f;
+      --surface: #0d0d1a;
+      --cyan:    #00fff0;
+      --magenta: #ff00cc;
+      --yellow:  #ffe600;
+      --text:    #d8e4ff;
+      --muted:   #556080;
+      --glow-c:  0 0 14px rgba(0,255,240,0.5);
+      --glow-m:  0 0 14px rgba(255,0,204,0.5);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    body, h1, h2, p, ul, li { margin: 0; padding: 0; }
+    /* Isolate Timeline.js from our resets */
+    #timeline-embed * { box-sizing: content-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Courier New', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Scanlines */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 9998; pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 3px,
+        rgba(0,255,240,0.018) 3px, rgba(0,255,240,0.018) 4px
+      );
+    }
+
+    /* Grid */
+    body::after {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(0,255,240,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,255,240,0.035) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    /* ── Glitch title ── */
+    @keyframes glitch-1 {
+      0%,100%  { clip-path: none; transform: none; }
+      8%  { clip-path: polygon(0 10%, 100% 10%, 100% 25%, 0 25%); transform: translateX(-4px); color: var(--magenta); }
+      16% { clip-path: polygon(0 55%, 100% 55%, 100% 70%, 0 70%); transform: translateX(4px);  color: var(--cyan); }
+      24% { clip-path: none; transform: none; }
+    }
+    @keyframes glitch-2 {
+      0%,100% { opacity: 0; }
+      8%  { opacity: 1; transform: translateX(3px);  color: var(--cyan); }
+      16% { opacity: 1; transform: translateX(-3px); color: var(--magenta); }
+      24% { opacity: 0; }
+    }
+
+    .glitch-wrap { position: relative; display: inline-block; }
+    .glitch-wrap::before,
+    .glitch-wrap::after {
+      content: attr(data-text);
+      position: absolute; inset: 0;
+      font: inherit; letter-spacing: inherit;
+    }
+    .glitch-wrap::before { animation: glitch-1 6s infinite; }
+    .glitch-wrap::after  { animation: glitch-2 6s infinite; opacity: 0; }
+
+    /* ── Layout ── */
+    #app { position: relative; z-index: 10; display: flex; flex-direction: column; height: 100vh; }
+
+    header {
+      flex-shrink: 0;
+      padding: 18px 24px 0;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+    }
+
+    .title-area {
+      grid-column: 2;
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      text-align: center;
+    }
+
+    .header-right {
+      grid-column: 3;
+      display: flex; justify-content: flex-end; align-items: center;
+    }
+
+    .sys-label {
+      font-size: 9px; letter-spacing: 4px; color: var(--muted); text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: clamp(16px, 2.8vw, 26px);
+      font-weight: 700; letter-spacing: 3px;
+      color: var(--cyan); text-shadow: var(--glow-c);
+    }
+
+    .subtitle { font-size: 10px; color: var(--muted); letter-spacing: 1px; margin-top: 3px; }
+
+    /* ── Controls bar ── */
+    .controls {
+      flex-shrink: 0;
+      padding: 10px 24px;
+      display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+    }
+
+    /* ── Reveal groups ── */
+    .btn-group {
+      display: flex; align-items: center; gap: 0;
+      position: relative;
+    }
+
+    .btn {
+      background: transparent; border: none; outline: none;
+      font-family: inherit; font-size: 11px; letter-spacing: 2.5px;
+      cursor: pointer; text-transform: uppercase;
+      position: relative; white-space: nowrap;
+      transition: color 0.2s, max-width 0.3s ease, opacity 0.25s ease, padding 0.3s ease;
+    }
+
+    /* Active button — always visible */
+    .btn[class*="active"] {
+      padding: 6px 4px 6px 0;
+      pointer-events: auto;
+      overflow: visible;
+    }
+
+    /* Expand chevron after active label */
+    .btn[class*="active"]::before {
+      content: ' ›';
+      font-size: 9px; opacity: 0.45;
+      transition: opacity 0.2s;
+    }
+    .btn-group:hover .btn[class*="active"]::before { opacity: 0; }
+
+    /* Non-active buttons — hidden by default, revealed on group hover */
+    .btn:not([class*="active"]) {
+      max-width: 0; padding: 6px 0; opacity: 0;
+      overflow: hidden; pointer-events: none;
+      color: var(--muted);
+    }
+    .btn-group:hover .btn:not([class*="active"]) {
+      max-width: 90px; padding: 6px 14px; opacity: 1; pointer-events: auto;
+    }
+    .btn:not([class*="active"]):hover { color: var(--text); }
+
+    /* Slash separator — only visible when expanded */
+    .btn + .btn::after {
+      content: '/';
+      position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+      color: rgba(255,255,255,0.12); font-size: 9px; pointer-events: none;
+      opacity: 0; transition: opacity 0.2s 0.1s;
+    }
+    .btn-group:hover .btn + .btn::after { opacity: 1; }
+
+    /* Active color states */
+    .btn.active-cyan    { color: var(--cyan);    text-shadow: var(--glow-c); }
+    .btn.active-magenta { color: var(--magenta); text-shadow: var(--glow-m); }
+    .btn.active-yellow  { color: var(--yellow);  text-shadow: 0 0 14px rgba(255,230,0,0.6); }
+
+    /* Track hint */
+    .track-hint {
+      font-size: 8px; letter-spacing: 2px;
+      color: rgba(255,255,255,0.6);
+      font-family: 'Courier New', monospace;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    #track-btns:hover ~ .track-hint { opacity: 0; }
+
+    /* Language switcher sizing */
+    #lang-btns .btn { font-size: 10px; letter-spacing: 2px; }
+    #lang-btns:hover .btn:not([class*="active"]) { max-width: 80px; padding: 6px 10px; }
+
+    /* ── Progress bar ── */
+    #progress-wrap {
+      flex-shrink: 0;
+      height: 22px; padding: 0 24px;
+      display: flex; align-items: center; gap: 10px;
+      opacity: 0; transition: opacity 0.2s;
+    }
+    #progress-wrap.visible { opacity: 1; }
+    #progress-bar-bg {
+      flex: 1; height: 2px;
+      background: rgba(0,255,240,0.1); border-radius: 2px; overflow: hidden;
+    }
+    #progress-bar-fill {
+      height: 100%; width: 0%; background: var(--cyan);
+      box-shadow: var(--glow-c); transition: width 0.1s;
+    }
+    #progress-label { font-size: 9px; letter-spacing: 2px; color: var(--muted); white-space: nowrap; }
+
+    /* ── Horizontal divider ── */
+    .h-rule {
+      flex-shrink: 0; margin: 0 24px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cyan) 30%, var(--magenta) 70%, transparent);
+      opacity: 0.3;
+    }
+
+    /* ── Timeline embed ── */
+    #timeline-wrap {
+      flex: 1; position: relative; min-height: 0;
+      margin: 8px 16px 0;
+    }
+
+    #timeline-embed {
+      width: 100%;
+      height: calc(100vh - 300px);
+      min-height: 380px;
+      border: 1px solid rgba(0,255,240,0.1); border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .spinner {
+      width: 36px; height: 36px;
+      border: 2px solid rgba(0,255,240,0.1);
+      border-top-color: var(--cyan); border-right-color: var(--magenta);
+      border-radius: 50%; animation: spin 0.7s linear infinite;
+      box-shadow: var(--glow-c);
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #tl-status {
+      display: flex; align-items: center; gap: 12px;
+      padding: 40px; justify-content: center;
+      font-size: 11px; letter-spacing: 2px; color: var(--muted);
+    }
+
+    /* ── Figures gallery ── */
+    #gallery-wrap {
+      flex-shrink: 0;
+      margin: 8px 0 0;
+      overflow: hidden;
+      border-top: 1px solid rgba(0,255,240,0.08);
+      position: relative;
+    }
+
+    /* Fade edges */
+    #gallery-wrap::before,
+    #gallery-wrap::after {
+      content: ''; position: absolute; top: 0; bottom: 0; z-index: 2; width: 80px; pointer-events: none;
+    }
+    #gallery-wrap::before { left: 0;  background: linear-gradient(90deg, var(--bg), transparent); }
+    #gallery-wrap::after  { right: 0; background: linear-gradient(-90deg, var(--bg), transparent); }
+
+    .gallery-track {
+      display: flex; gap: 0;
+      animation: marquee 55s linear infinite;
+      width: max-content;
+    }
+    .gallery-track:hover { animation-play-state: paused; }
+
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    .figure-card {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 10px 20px; gap: 5px;
+      text-decoration: none; color: inherit;
+      border-right: 1px solid rgba(0,255,240,0.06);
+      transition: background 0.2s;
+      min-width: 130px;
+    }
+    .figure-card:hover { background: rgba(0,255,240,0.04); }
+    .figure-card:hover .fig-name { color: var(--cyan); text-shadow: var(--glow-c); }
+
+    .fig-img {
+      width: 48px; height: 48px; border-radius: 50%; object-fit: cover;
+      border: 1px solid rgba(0,255,240,0.2);
+      filter: grayscale(40%) brightness(0.9);
+      transition: filter 0.2s;
+    }
+    .figure-card:hover .fig-img { filter: grayscale(0%) brightness(1); }
+
+    .fig-name  { font-size: 10px; letter-spacing: 1px; color: var(--text); text-align: center; }
+    .fig-years { font-size: 8px;  color: var(--muted); }
+    .fig-role  { font-size: 8px;  color: var(--muted); text-align: center; max-width: 120px; line-height: 1.4; }
+
+    /* ── Footer ── */
+    footer {
+      flex-shrink: 0;
+      text-align: center; padding: 6px;
+      font-size: 8px; letter-spacing: 2px; color: var(--muted);
+    }
+    footer a { color: var(--cyan); text-decoration: none; opacity: 0.5; }
+    footer a:hover { opacity: 1; }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      header { padding: 12px 14px 0; }
+      .controls { padding: 8px 14px; }
+      .h-rule { margin: 0 14px; }
+      #timeline-wrap { margin: 6px 8px 0; }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <div></div>
+    <div class="title-area">
+      <div class="sys-label">// SYS:ARCHIVE 1943—2025</div>
+      <h1>
+        <span class="glitch-wrap" id="main-title" data-text="人工智能简史">人工智能简史</span>
+      </h1>
+      <div class="subtitle" id="main-subtitle">三条时间线 · 七十年演进</div>
+    </div>
+    <div class="header-right">
+      <div class="btn-group" id="lang-btns">
+        <button class="btn active-cyan" data-lang="zh" onclick="selectLang('zh')">中文</button>
+        <button class="btn"             data-lang="en" onclick="selectLang('en')">EN</button>
+        <button class="btn"             data-lang="ja" onclick="selectLang('ja')">日本語</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="controls">
+    <div class="btn-group" id="track-btns">
+      <button class="btn active-cyan" data-track="ai" onclick="selectTrack('ai')">AI</button>
+      <button class="btn"             data-track="ml" onclick="selectTrack('ml')">ML</button>
+      <button class="btn"             data-track="dl" onclick="selectTrack('dl')">DL</button>
+    </div>
+    <span class="track-hint">← 鼠标悬停这里以切换</span>
+  </div>
+
+  <!-- Translation progress -->
+  <div id="progress-wrap">
+    <div id="progress-bar-bg"><div id="progress-bar-fill"></div></div>
+    <div id="progress-label">TRANSLATING 0/0</div>
+  </div>
+
+  <div class="h-rule"></div>
+
+  <!-- Timeline -->
+  <div id="timeline-wrap">
+    <div id="timeline-embed">
+      <div id="tl-status"><div class="spinner"></div>LOADING...</div>
+    </div>
+  </div>
+
+  <!-- Figures gallery -->
+  <div id="gallery-wrap">
+    <div id="gallery-inner"></div>
+  </div>
+
+  <footer>
+    <a href="https://timeline.knightlab.com/" target="_blank">TIMELINE.JS</a> ·
+    TRANSLATION: <a href="https://mymemory.translated.net/" target="_blank">MYMEMORY API</a> ·
+    IMAGES: <a href="https://commons.wikimedia.org/" target="_blank">WIKIMEDIA COMMONS</a>
+  </footer>
+
+</div>
+
+<script>
+// ── State ────────────────────────────────────────────────────────────────────
+let currentTrack = 'ai';
+let currentLang  = 'zh';
+const CACHE_PREFIX = 'aitl2_';
+
+// ── Translation Engine ────────────────────────────────────────────────────────
+
+// Cache key: "aitl2_en_ai"  → JSON { "0.headline": "...", "0.text": "...", ... }
+function getCacheKey(lang, track) { return `${CACHE_PREFIX}${lang}_${track}`; }
+
+function loadCache(lang, track) {
+  try { return JSON.parse(localStorage.getItem(getCacheKey(lang, track)) || 'null'); }
+  catch { return null; }
+}
+
+function saveCache(lang, track, data) {
+  try { localStorage.setItem(getCacheKey(lang, track), JSON.stringify(data)); }
+  catch {}
+}
+
+// MyMemory langpair codes
+const LANG_PAIR = { en: 'zh-CN|en-GB', ja: 'zh-CN|ja' };
+
+async function fetchTranslation(text, lang) {
+  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${LANG_PAIR[lang]}`;
+  const r = await fetch(url);
+  if (!r.ok) return text;
+  const d = await r.json();
+  if (d.responseStatus !== 200) return text;
+  const t = d.responseData.translatedText;
+  // MyMemory returns warning strings when rate-limited
+  if (t && !t.startsWith('MYMEMORY WARNING')) return t;
+  return text;
+}
+
+// Translate all text fields for a track, with concurrency=4 and progress bar
+async function translateTrack(lang, track) {
+  const cached = loadCache(lang, track);
+  if (cached) return cached;
+
+  const src = TRACKS[track];
+  const items = [
+    { key:'title.headline', text: src.titleHeadline },
+    { key:'title.text',     text: src.titleText },
+    // figure roles (shared across tracks, cache under track='__figs')
+  ];
+  src.events.forEach((e, i) => {
+    items.push({ key:`${i}.headline`, text: e.headline });
+    items.push({ key:`${i}.text`,     text: e.text });
+    if (e.imgCaption) items.push({ key:`${i}.cap`, text: e.imgCaption });
+  });
+
+  const total   = items.length;
+  let   done    = 0;
+  const result  = {};
+
+  showProgress(0, total);
+
+  // Process in batches of 4 (rate-limit friendly)
+  for (let i = 0; i < items.length; i += 4) {
+    const batch = items.slice(i, i + 4);
+    await Promise.all(batch.map(async item => {
+      result[item.key] = await fetchTranslation(item.text, lang);
+      done++;
+      showProgress(done, total);
+    }));
+    if (i + 4 < items.length) await sleep(220);
+  }
+
+  saveCache(lang, track, result);
+  return result;
+}
+
+// Translate figure roles (shared, cached under a special key)
+async function translateFigureRoles(lang) {
+  const key = `${CACHE_PREFIX}${lang}__figs`;
+  try {
+    const c = localStorage.getItem(key);
+    if (c) return JSON.parse(c);
+  } catch {}
+
+  const results = {};
+  for (let i = 0; i < FIGURES.length; i += 4) {
+    const batch = FIGURES.slice(i, i + 4);
+    await Promise.all(batch.map(async (f, bi) => {
+      results[i + bi] = await fetchTranslation(f.roleZh, lang);
+    }));
+    if (i + 4 < FIGURES.length) await sleep(220);
+  }
+
+  try { localStorage.setItem(key, JSON.stringify(results)); } catch {}
+  return results;
+}
+
+// ── UI Helpers ────────────────────────────────────────────────────────────────
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function showProgress(done, total) {
+  const wrap  = document.getElementById('progress-wrap');
+  const fill  = document.getElementById('progress-bar-fill');
+  const label = document.getElementById('progress-label');
+  wrap.classList.add('visible');
+  fill.style.width = `${Math.round((done / total) * 100)}%`;
+  label.textContent = `TRANSLATING ${done}/${total}`;
+  if (done >= total) {
+    setTimeout(() => wrap.classList.remove('visible'), 800);
+  }
+}
+
+// ── Timeline Builder ──────────────────────────────────────────────────────────
+
+function buildTLData(track, translations) {
+  const src  = TRACKS[track];
+  const t    = translations || {};
+  const data = {
+    title: {
+      text: {
+        headline: t['title.headline'] || src.titleHeadline,
+        text: `<p>${t['title.text'] || src.titleText}</p>`
+      }
+    },
+    events: src.events.map((e, i) => {
+      const ev = {
+        start_date: { year: e.year, ...(e.month ? { month: e.month } : {}) },
+        text: {
+          headline: t[`${i}.headline`] || e.headline,
+          text: `<p>${t[`${i}.text`] || e.text}</p>`
+        }
+      };
+      if (e.img) {
+        ev.media = {
+          url: e.img,
+          caption: t[`${i}.cap`] || e.imgCaption || ''
+        };
+      }
+      return ev;
+    })
+  };
+  return data;
+}
+
+let tlInstance = null;
+
+function renderTimeline(data) {
+  const embed = document.getElementById('timeline-embed');
+  embed.innerHTML = '';
+  try {
+    tlInstance = new TL.Timeline('timeline-embed', data, {
+      timenav_position: 'bottom',
+      scale_factor: 2
+    });
+  } catch (err) {
+    console.error('Timeline.js init failed:', err);
+    embed.innerHTML =
+      `<div style="color:#ff6060;padding:24px;font-size:12px;letter-spacing:1px;font-family:monospace">⚠ ${err.message}</div>`;
+  }
+}
+
+// ── Gallery ───────────────────────────────────────────────────────────────────
+
+function renderGallery(lang, figureRoles) {
+  const nameKey = lang === 'en' ? 'nameEn' : lang === 'ja' ? 'nameJa' : 'nameZh';
+
+  // Build cards (doubled for seamless loop)
+  const cards = [...FIGURES, ...FIGURES].map((f, i) => {
+    const role = figureRoles && figureRoles[i % FIGURES.length]
+      ? figureRoles[i % FIGURES.length]
+      : f.roleZh;
+    return `<a class="figure-card" href="${f.wiki}" target="_blank" rel="noopener">
+      <img class="fig-img" src="${f.img}" alt="${f[nameKey]}" loading="lazy"
+           onerror="this.style.display='none'">
+      <div class="fig-name">${f[nameKey]}</div>
+      <div class="fig-years">${f.years}</div>
+      <div class="fig-role">${role}</div>
+    </a>`;
+  }).join('');
+
+  document.getElementById('gallery-inner').innerHTML =
+    `<div class="gallery-track">${cards}</div>`;
+}
+
+// ── Track & Language Switches ─────────────────────────────────────────────────
+
+const TRACK_COLORS = { ai: 'active-cyan', ml: 'active-magenta', dl: 'active-yellow' };
+
+function selectTrack(track) {
+  if (track === currentTrack) return;
+  currentTrack = track;
+  document.querySelectorAll('#track-btns .btn').forEach(b => {
+    b.classList.remove('active-cyan','active-magenta','active-yellow');
+    if (b.dataset.track === track) b.classList.add(TRACK_COLORS[track]);
+  });
+  load(currentTrack, currentLang);
+}
+
+function selectLang(lang) {
+  if (lang === currentLang) return;
+  currentLang = lang;
+  document.querySelectorAll('#lang-btns .btn').forEach(b => {
+    b.classList.remove('active-cyan');
+    if (b.dataset.lang === lang) b.classList.add('active-cyan');
+  });
+  document.documentElement.lang = lang === 'zh' ? 'zh' : lang;
+  updateHeader(lang);
+  load(currentTrack, lang);
+  refreshGallery(lang);
+}
+
+const HEADER_TEXT = {
+  zh: { title:'人工智能简史', sub:'三条时间线 · 七十年演进', hint:'← 鼠标悬停这里以切换' },
+  en: { title:'History of AI · ML · DL', sub:'Three Tracks · Seventy Years', hint:'← Hover here to switch' },
+  ja: { title:'AI · ML · DL の歴史', sub:'三つのトラック · 七十年の変遷', hint:'← ここにホバーして切り替え' }
+};
+
+function updateHeader(lang) {
+  const h = HEADER_TEXT[lang];
+  const el = document.getElementById('main-title');
+  const su = document.getElementById('main-subtitle');
+  el.textContent = h.title;
+  el.dataset.text = h.title;
+  su.textContent  = h.sub;
+  document.querySelector('.track-hint').textContent = h.hint;
+}
+
+// ── Main Load ─────────────────────────────────────────────────────────────────
+
+async function load(track, lang) {
+  let translations = null;
+
+  if (lang !== 'zh') {
+    translations = await translateTrack(lang, track);
+  }
+
+  const data = buildTLData(track, translations);
+  renderTimeline(data);
+}
+
+async function refreshGallery(lang) {
+  let roles = null;
+  if (lang !== 'zh') {
+    roles = await translateFigureRoles(lang);
+  }
+  renderGallery(lang, roles);
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+document.querySelector('.track-hint').textContent = HEADER_TEXT['zh'].hint;
+renderGallery('zh', null);
+load('ai', 'zh');
+</script>
+</body>
+</html>
