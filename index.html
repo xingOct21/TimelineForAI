@@ -83,7 +83,7 @@
 
     header {
       flex-shrink: 0;
-      padding: 18px 24px 0;
+      padding: 10px 24px 0;
       display: grid;
       grid-template-columns: 1fr auto 1fr;
       align-items: center;
@@ -215,14 +215,14 @@
 
     /* ── Timeline embed ── */
     #timeline-wrap {
-      flex: 1; position: relative; min-height: 0;
+      flex: none; position: relative;
       margin: 8px 16px 0;
     }
 
     #timeline-embed {
       width: 100%;
-      height: calc(100vh - 300px);
-      min-height: 380px;
+      height: calc(100vh - 420px);
+      min-height: 300px;
       border: 1px solid rgba(0,255,240,0.1); border-radius: 4px;
       overflow: hidden;
     }
@@ -282,9 +282,16 @@
     .figure-card:hover { background: rgba(0,255,240,0.04); }
     .figure-card:hover .fig-name { color: var(--cyan); text-shadow: var(--glow-c); }
 
-    .fig-img {
-      width: 48px; height: 48px; border-radius: 50%; object-fit: cover;
+    .fig-img-wrap {
+      width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0;
       border: 1px solid rgba(0,255,240,0.2);
+      overflow: hidden; display: flex; align-items: center; justify-content: center;
+      background: rgba(0,255,240,0.05);
+      font-size: 14px; color: var(--cyan); letter-spacing: 0;
+    }
+    .figure-card:hover .fig-img-wrap { border-color: rgba(0,255,240,0.5); }
+    .fig-img {
+      width: 100%; height: 100%; object-fit: cover;
       filter: grayscale(40%) brightness(0.9);
       transition: filter 0.2s;
     }
@@ -322,7 +329,6 @@
       <h1>
         <span class="glitch-wrap" id="main-title" data-text="人工智能简史">人工智能简史</span>
       </h1>
-      <div class="subtitle" id="main-subtitle">三条时间线 · 七十年演进</div>
     </div>
     <div class="header-right">
       <div class="btn-group" id="lang-btns">
@@ -540,9 +546,12 @@ function renderGallery(lang, figureRoles) {
     const role = figureRoles && figureRoles[i % FIGURES.length]
       ? figureRoles[i % FIGURES.length]
       : f.roleZh;
+    const initial = f[nameKey].replace(/[\s·]/g,'').charAt(0);
+    const imgHtml = f.img
+      ? `<img class="fig-img" src="${f.img}" alt="${f[nameKey]}" loading="lazy" onerror="this.style.display='none'">`
+      : '';
     return `<a class="figure-card" href="${f.wiki}" target="_blank" rel="noopener">
-      <img class="fig-img" src="${f.img}" alt="${f[nameKey]}" loading="lazy"
-           onerror="this.style.display='none'">
+      <div class="fig-img-wrap">${imgHtml || initial}</div>
       <div class="fig-name">${f[nameKey]}</div>
       <div class="fig-years">${f.years}</div>
       <div class="fig-role">${role}</div>
@@ -581,18 +590,16 @@ function selectLang(lang) {
 }
 
 const HEADER_TEXT = {
-  zh: { title:'人工智能简史', sub:'三条时间线 · 七十年演进', hint:'← 鼠标悬停这里以切换' },
-  en: { title:'History of AI · ML · DL', sub:'Three Tracks · Seventy Years', hint:'← Hover here to switch' },
-  ja: { title:'AI · ML · DL の歴史', sub:'三つのトラック · 七十年の変遷', hint:'← ここにホバーして切り替え' }
+  zh: { title:'人工智能简史', hint:'← 鼠标悬停这里以切换' },
+  en: { title:'History of AI · ML · DL', hint:'← Hover here to switch' },
+  ja: { title:'AI · ML · DL の歴史', hint:'← ここにホバーして切り替え' }
 };
 
 function updateHeader(lang) {
   const h = HEADER_TEXT[lang];
   const el = document.getElementById('main-title');
-  const su = document.getElementById('main-subtitle');
   el.textContent = h.title;
   el.dataset.text = h.title;
-  su.textContent  = h.sub;
   document.querySelector('.track-hint').textContent = h.hint;
 }
 
