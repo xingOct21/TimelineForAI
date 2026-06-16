@@ -26,7 +26,11 @@
     /* Isolate Timeline.js from our resets */
     #timeline-embed * { box-sizing: content-box; }
 
-    html { height: 100%; }
+    html {
+      height: 100%;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
     body {
       background: var(--bg);
       color: var(--text);
@@ -93,7 +97,7 @@
     }
     #page-tree {
       height: 100vh; scroll-snap-align: start;
-      overflow: hidden; background: #080808;
+      overflow-y: auto; background: var(--bg);
       display: flex; flex-direction: column;
     }
     /* Page nav dots */
@@ -101,13 +105,38 @@
       position: fixed; right: 20px; top: 50%;
       transform: translateY(-50%); z-index: 9999;
       display: flex; flex-direction: column; gap: 10px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s;
     }
+    #page-dots.visible { opacity: 1; pointer-events: auto; }
     .page-dot {
       width: 7px; height: 7px; border-radius: 50%; border: none;
       background: rgba(255,255,255,0.2); cursor: pointer;
       padding: 0; transition: background 0.3s, transform 0.3s;
     }
     .page-dot.active { background: rgba(196,170,110,0.85); transform: scale(1.3); }
+
+    /* ── Timeline → Tree arrow CTA ── */
+    #tree-cta {
+      flex-shrink: 0;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 6px 0 10px;
+      cursor: pointer; background: none; border: none;
+      color: rgba(196,170,110,0.7);
+      font-family: 'Courier New', monospace;
+      transition: color 0.25s;
+      width: 100%;
+    }
+    #tree-cta:hover { color: rgba(196,170,110,1); }
+    #tree-cta:hover .cta-arrow { transform: translateY(3px); }
+    .cta-label {
+      font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .cta-arrow {
+      font-size: 28px; line-height: 1;
+      transition: transform 0.25s ease;
+    }
 
     header {
       flex-shrink: 0;
@@ -352,7 +381,7 @@
     /* ── Knowledge Tree Section ── */
     #tree-section {
       flex: 1; padding: 32px 48px 16px;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      display: flex; flex-direction: column; align-items: center;
     }
     .tree-title {
       font-size: 44px;
@@ -360,11 +389,11 @@
       color: rgba(232, 218, 190, 0.9);
       letter-spacing: 18px;
       text-indent: 18px;
-      margin: 0 0 60px 0;
+      margin: 0 0 16px 0;
       font-family: 'Georgia', 'Noto Serif SC', serif;
     }
     #tree-svg {
-      width: 100%; max-width: 960px; height: auto;
+      width: 100%; max-width: 1100px; height: auto;
     }
     .tree-root-ring {
       transform-box: fill-box; transform-origin: center;
@@ -385,24 +414,95 @@
     /* ── Tree Cards ── */
     .tree-card {
       width: 100%; height: 100%;
-      background: rgba(8,8,8,0.96);
+      background: rgba(7,7,15,0.96);
       border: 1px solid rgba(196,170,110,0.22);
-      border-radius: 2px;
+      border-radius: 3px;
       box-sizing: border-box;
-      padding: 8px 10px;
+      padding: 10px 12px;
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 6px;
       overflow: hidden;
+      transition-property: border-color, background, box-shadow;
+      transition-duration: 180ms;
+      transition-timing-function: ease-out;
     }
     .card-tag {
-      font-size: 7px;
-      letter-spacing: 2.5px;
+      font-size: 11px;
+      letter-spacing: 2px;
       text-transform: uppercase;
       color: rgba(196,170,110,0.5);
       font-family: 'Courier New', monospace;
     }
     .card-slot { flex: 1; }
+    .card-title {
+      font-size: 14px;
+      color: rgba(196,170,110,0.88);
+      font-family: 'Courier New', monospace;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+    .tree-card.clickable { cursor: pointer; }
+    .tree-card.clickable:hover {
+      border-color: rgba(196,170,110,0.65);
+      background: rgba(18,14,4,0.99);
+    }
+    .tree-card.secondary { opacity: 0.65; border-color: rgba(196,170,110,0.14); }
+    .tree-card.secondary:hover { opacity: 1; }
+    /* Branch color overrides — 经典ML: Amber · CV: Teal · NLP: Fuchsia */
+    .branch-l { border-color: rgba(245,158,11,0.30) !important; }
+    .branch-l .card-tag   { color: rgba(245,158,11,0.62); }
+    .branch-l .card-title { color: rgba(253,186,55,0.92); }
+    .branch-l.clickable:hover {
+      border-color: rgba(245,158,11,0.72) !important;
+      box-shadow: 0 0 12px rgba(245,158,11,0.18), inset 0 0 8px rgba(245,158,11,0.06);
+    }
+    .branch-c { border-color: rgba(34,211,238,0.30) !important; }
+    .branch-c .card-tag   { color: rgba(34,211,238,0.62); }
+    .branch-c .card-title { color: rgba(103,232,249,0.92); }
+    .branch-c.clickable:hover {
+      border-color: rgba(34,211,238,0.72) !important;
+      box-shadow: 0 0 12px rgba(34,211,238,0.18), inset 0 0 8px rgba(34,211,238,0.06);
+    }
+    .branch-r { border-color: rgba(232,121,249,0.30) !important; }
+    .branch-r .card-tag   { color: rgba(232,121,249,0.62); }
+    .branch-r .card-title { color: rgba(240,171,252,0.92); }
+    .branch-r.clickable:hover {
+      border-color: rgba(232,121,249,0.72) !important;
+      box-shadow: 0 0 12px rgba(232,121,249,0.18), inset 0 0 8px rgba(232,121,249,0.06);
+    }
+    /* Tools table */
+    #tools-table {
+      width: 100%; max-width: 860px; margin: 0 auto 48px; padding: 28px 28px 0;
+      border-top: 1px solid rgba(196,170,110,0.1);
+    }
+    .tools-title {
+      font-family: 'Courier New', monospace; font-size: 13px; letter-spacing: 4px;
+      color: rgba(196,170,110,0.42); text-align: center; margin-bottom: 14px;
+      text-transform: uppercase;
+    }
+    .tools-grid {
+      width: 100%; border-collapse: collapse;
+      font-family: 'Courier New', monospace; font-size: 14px;
+    }
+    .tools-grid th {
+      text-align: left; color: rgba(196,170,110,0.35); font-size: 11px;
+      letter-spacing: 2px; text-transform: uppercase; padding: 5px 12px;
+      border-bottom: 1px solid rgba(196,170,110,0.1);
+    }
+    .tools-grid td {
+      padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: rgba(220,210,190,0.6); vertical-align: top; line-height: 1.6;
+    }
+    .tools-grid a {
+      color: rgba(196,170,110,0.78); text-decoration: none;
+    }
+    .tools-grid a:hover { color: rgba(196,170,110,1); }
+    .tools-grid .type-tag {
+      color: rgba(196,170,110,0.4); font-size: 11px;
+      letter-spacing: 1px; white-space: nowrap;
+    }
+    .tools-grid tr:hover td { background: rgba(196,170,110,0.025); }
   </style>
 </head>
 <body>
@@ -454,117 +554,266 @@
   <div id="gallery-wrap">
     <div id="gallery-inner"></div>
   </div>
+
+  <!-- Tree CTA -->
+  <button id="tree-cta" onclick="goToPage(1)" aria-label="进入AI学习树">
+    <span class="cta-label">点击进入 AI 学习树</span>
+    <span class="cta-arrow">⌄</span>
+  </button>
   </div><!-- /page-timeline -->
 
   <div id="page-tree">
   <!-- Knowledge Tree -->
   <section id="tree-section">
-    <h2 class="tree-title">知识树</h2>
-    <svg id="tree-svg" viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg">
+    <h2 class="tree-title">学习树</h2>
+    <svg id="tree-svg" viewBox="0 0 1200 1160" xmlns="http://www.w3.org/2000/svg">
 
-      <!-- Root pulse ring -->
-      <circle class="tree-root-ring" cx="500" cy="565" r="13" fill="none" stroke="#c4aa6e" stroke-width="1"/>
+      <!--
+        card = 190×74.  cx/cy = card center.
+        top-mid  = (cx, cy-37)
+        bot-mid  = (cx, cy+37)
+        All lines/paths run only between card edges — never through card bodies.
 
-      <!-- Trunk -->
-      <line x1="500" y1="565" x2="500" y2="440" stroke="rgba(196,170,110,0.22)" stroke-width="2.5"/>
+        Trunk cx=600:  cy 1000/900/800/700  split cy=600
+        Left  cx=100:  AI cy=460   Kaggle cy=300
+        Center cx=600: CNN cy=470  CS231n cy=310  作業 cy=150
+        Right: RNN cx=990 cy=460
+               注意力 cx=840 cy=300  (card x 745-935)
+               CS336  cx=1100 cy=300 (card x 1005-1195)  gap=70px
+               作业   cx=1100 cy=140
+      -->
 
-      <!-- ── AI BRANCH ── -->
-      <path d="M 500 440 C 455 395 285 310 190 250" stroke="#c4aa6e" stroke-width="2" fill="none"/>
-      <path d="M 190 250 C 162 205 108 145  85 105" stroke="#c4aa6e" stroke-width="1.4" fill="none" opacity="0.65"/>
-      <path d="M 190 250 C 202 202 252 148 278 105" stroke="#c4aa6e" stroke-width="1.4" fill="none" opacity="0.65"/>
-      <path d="M  85 105 C  72  75  58  48  48  28" stroke="#c4aa6e" stroke-width="0.9" fill="none" opacity="0.3"/>
-      <path d="M  85 105 C  93  74 112  50 122  28" stroke="#c4aa6e" stroke-width="0.9" fill="none" opacity="0.3"/>
-      <path d="M 278 105 C 262  74 248  50 242  28" stroke="#c4aa6e" stroke-width="0.9" fill="none" opacity="0.3"/>
-      <path d="M 278 105 C 285  73 300  50 310  28" stroke="#c4aa6e" stroke-width="0.9" fill="none" opacity="0.3"/>
-      <circle cx="190" cy="250" r="5"   fill="#080808" stroke="#c4aa6e" stroke-width="1.5"/>
-      <circle cx=" 85" cy="105" r="3.5" fill="#080808" stroke="#c4aa6e" stroke-width="1.2" opacity="0.65"/>
-      <circle cx="278" cy="105" r="3.5" fill="#080808" stroke="#c4aa6e" stroke-width="1.2" opacity="0.65"/>
-      <circle cx=" 48" cy=" 28" r="2.5" fill="#080808" stroke="#c4aa6e" stroke-width="1"  opacity="0.3"/>
-      <circle cx="122" cy=" 28" r="2.5" fill="#080808" stroke="#c4aa6e" stroke-width="1"  opacity="0.3"/>
-      <circle cx="242" cy=" 28" r="2.5" fill="#080808" stroke="#c4aa6e" stroke-width="1"  opacity="0.3"/>
-      <circle cx="310" cy=" 28" r="2.5" fill="#080808" stroke="#c4aa6e" stroke-width="1"  opacity="0.3"/>
-      <foreignObject x="124" y="257" width="132" height="72">
-        <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card">
-          <div class="card-tag">AI</div><div class="card-slot"></div>
-        </div>
-      </foreignObject>
-      <foreignObject x="28"  y="108" width="114" height="60">
-        <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card">
-          <div class="card-tag">AI</div><div class="card-slot"></div>
-        </div>
-      </foreignObject>
-      <foreignObject x="222" y="108" width="114" height="60">
-        <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card">
-          <div class="card-tag">AI</div><div class="card-slot"></div>
-        </div>
-      </foreignObject>
+      <!-- ══ LEGEND ══ -->
+      <line x1="20" y1="26" x2="58" y2="26" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="39" cy="26" r="3.5" fill="#F59E0B" opacity="0.85"/>
+      <text x="66" y="31" fill="rgba(245,158,11,0.82)" font-family="'Courier New',monospace" font-size="12" letter-spacing="1">经典机器学习</text>
 
-      <!-- ── ML BRANCH ── -->
-      <path d="M 500 440 C 500 395 500 320 500 200" stroke="#c4aa6e" stroke-width="2" fill="none"/>
-      <path d="M 500 200 C 468 158 420 110 395  70" stroke="#c4aa6e" stroke-width="1.4" fill="none" opacity="0.65"/>
-      <path d="M 500 200 C 532 158 580 110 605  70" stroke="#c4aa6e" stroke-width="1.4" fill="none" opacity="0.65"/>
-      <path d="M 395  70 C 378  45 362  26 355  12" stroke="#c4aa6e" stroke-width="0.9" fill="none" opacity="0.3"/>
-      <path d="M 395  70 C 403  44 420  26 428  12" stroke="#c4aa6e" stroke-width="0.9" fill="none" opacity="0.3"/>
-      <path d="M 605  70 C 597  44 580  26 572  12" stroke="#c4aa6e" stroke-width="0.9" fill="none" opacity="0.3"/>
-      <path d="M 605  70 C 622  45 638  26 645  12" stroke="#c4aa6e" stroke-width="0.9" fill="none" opacity="0.3"/>
-      <circle cx="500" cy="200" r="5"   fill="#080808" stroke="#c4aa6e" stroke-width="1.5"/>
-      <circle cx="395" cy=" 70" r="3.5" fill="#080808" stroke="#c4aa6e" stroke-width="1.2" opacity="0.65"/>
-      <circle cx="605" cy=" 70" r="3.5" fill="#080808" stroke="#c4aa6e" stroke-width="1.2" opacity="0.65"/>
-      <circle cx="355" cy=" 12" r="2.5" fill="#080808" stroke="#c4aa6e" stroke-width="1"  opacity="0.3"/>
-      <circle cx="428" cy=" 12" r="2.5" fill="#080808" stroke="#c4aa6e" stroke-width="1"  opacity="0.3"/>
-      <circle cx="572" cy=" 12" r="2.5" fill="#080808" stroke="#c4aa6e" stroke-width="1"  opacity="0.3"/>
-      <circle cx="645" cy=" 12" r="2.5" fill="#080808" stroke="#c4aa6e" stroke-width="1"  opacity="0.3"/>
-      <foreignObject x="434" y="207" width="132" height="72">
-        <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card">
-          <div class="card-tag">ML</div><div class="card-slot"></div>
-        </div>
-      </foreignObject>
-      <foreignObject x="338" y="73"  width="114" height="60">
-        <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card">
-          <div class="card-tag">ML</div><div class="card-slot"></div>
-        </div>
-      </foreignObject>
-      <foreignObject x="548" y="73"  width="114" height="60">
-        <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card">
-          <div class="card-tag">ML</div><div class="card-slot"></div>
-        </div>
-      </foreignObject>
+      <line x1="20" y1="57" x2="58" y2="57" stroke="#22D3EE" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="39" cy="57" r="3.5" fill="#22D3EE" opacity="0.85"/>
+      <text x="66" y="62" fill="rgba(34,211,238,0.82)" font-family="'Courier New',monospace" font-size="12" letter-spacing="1">计算机视觉</text>
 
-      <!-- ── DL BRANCH ── -->
-      <path d="M 500 440 C 545 395 715 310 810 250" stroke="#c4aa6e" stroke-width="2" fill="none"/>
-      <path d="M 810 250 C 782 205 728 145 705 105" stroke="#c4aa6e" stroke-width="1.4" fill="none" opacity="0.65"/>
-      <path d="M 810 250 C 822 202 872 148 898 105" stroke="#c4aa6e" stroke-width="1.4" fill="none" opacity="0.65"/>
-      <path d="M 705 105 C 688  75 672  48 660  28" stroke="#c4aa6e" stroke-width="0.9" fill="none" opacity="0.3"/>
-      <path d="M 705 105 C 715  74 732  50 742  28" stroke="#c4aa6e" stroke-width="0.9" fill="none" opacity="0.3"/>
-      <path d="M 898 105 C 882  74 868  50 862  28" stroke="#c4aa6e" stroke-width="0.9" fill="none" opacity="0.3"/>
-      <path d="M 898 105 C 907  73 922  50 932  28" stroke="#c4aa6e" stroke-width="0.9" fill="none" opacity="0.3"/>
-      <circle cx="810" cy="250" r="5"   fill="#080808" stroke="#c4aa6e" stroke-width="1.5"/>
-      <circle cx="705" cy="105" r="3.5" fill="#080808" stroke="#c4aa6e" stroke-width="1.2" opacity="0.65"/>
-      <circle cx="898" cy="105" r="3.5" fill="#080808" stroke="#c4aa6e" stroke-width="1.2" opacity="0.65"/>
-      <circle cx="660" cy=" 28" r="2.5" fill="#080808" stroke="#c4aa6e" stroke-width="1"  opacity="0.3"/>
-      <circle cx="742" cy=" 28" r="2.5" fill="#080808" stroke="#c4aa6e" stroke-width="1"  opacity="0.3"/>
-      <circle cx="862" cy=" 28" r="2.5" fill="#080808" stroke="#c4aa6e" stroke-width="1"  opacity="0.3"/>
-      <circle cx="932" cy=" 28" r="2.5" fill="#080808" stroke="#c4aa6e" stroke-width="1"  opacity="0.3"/>
-      <foreignObject x="744" y="257" width="132" height="72">
-        <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card">
-          <div class="card-tag">DL</div><div class="card-slot"></div>
-        </div>
-      </foreignObject>
-      <foreignObject x="648" y="108" width="114" height="60">
-        <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card">
-          <div class="card-tag">DL</div><div class="card-slot"></div>
-        </div>
-      </foreignObject>
-      <foreignObject x="842" y="108" width="114" height="60">
-        <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card">
-          <div class="card-tag">DL</div><div class="card-slot"></div>
-        </div>
-      </foreignObject>
+      <line x1="20" y1="88" x2="58" y2="88" stroke="#E879F9" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="39" cy="88" r="3.5" fill="#E879F9" opacity="0.85"/>
+      <text x="66" y="93" fill="rgba(232,121,249,0.82)" font-family="'Courier New',monospace" font-size="12" letter-spacing="1">NLP / 大模型</text>
 
-      <!-- Split & root -->
-      <circle cx="500" cy="440" r="4"   fill="#080808" stroke="rgba(196,170,110,0.3)" stroke-width="1.5"/>
-      <circle class="tree-root-dot" cx="500" cy="565" r="5" fill="#080808" stroke="#c4aa6e" stroke-width="1.5"/>
+      <!-- ══ ROOT ══ -->
+      <circle class="tree-root-ring" cx="600" cy="1100" r="13" fill="none" stroke="#c4aa6e" stroke-width="1"/>
+      <text x="600" y="1128" text-anchor="middle" fill="rgba(196,170,110,0.42)"
+            font-family="'Courier New',monospace" font-size="13" letter-spacing="1.5">基础准备 · Python / 线代 / 概率统计</text>
+      <circle class="tree-root-dot" cx="600" cy="1100" r="5" fill="#080808" stroke="#c4aa6e" stroke-width="1.5"/>
+
+      <!-- ══ TRUNK LINE  root→split ══ -->
+      <line x1="600" y1="1100" x2="600" y2="600" stroke="rgba(196,170,110,0.22)" stroke-width="2.5"/>
+
+      <!-- ── N01  cy=1000  card y=963-1037 ── -->
+      <g onclick="window.open('https://github.com/microsoft/ML-For-Beginners','_blank')" style="cursor:pointer">
+        <rect x="505" y="963" width="190" height="74" rx="3" fill="rgba(7,7,15,0.97)"/>
+        <foreignObject x="505" y="963" width="190" height="74">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card clickable">
+            <div class="card-tag">ML · 入门</div>
+            <div class="card-title">ML-For-Beginners</div>
+          </div>
+        </foreignObject>
+      </g>
+
+      <!-- ── N02  cy=900  card y=863-937 ── -->
+      <g onclick="window.open('https://github.com/d2l-ai/d2l-zh','_blank')" style="cursor:pointer">
+        <rect x="505" y="863" width="190" height="74" rx="3" fill="rgba(7,7,15,0.97)"/>
+        <foreignObject x="505" y="863" width="190" height="74">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card clickable">
+            <div class="card-tag">D2L · 预备</div>
+            <div class="card-title">d2l 第1-2章 预备知识</div>
+          </div>
+        </foreignObject>
+      </g>
+
+      <!-- ── N03  cy=800  card y=763-837 ── -->
+      <g onclick="window.open('https://github.com/d2l-ai/d2l-zh','_blank')" style="cursor:pointer">
+        <rect x="505" y="763" width="190" height="74" rx="3" fill="rgba(7,7,15,0.97)"/>
+        <foreignObject x="505" y="763" width="190" height="74">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card clickable">
+            <div class="card-tag">D2L · 线性/MLP</div>
+            <div class="card-title">d2l 第3-4章 线性/MLP</div>
+          </div>
+        </foreignObject>
+      </g>
+
+      <!-- ── N04  cy=700  card y=663-737 ── -->
+      <g onclick="window.open('https://github.com/d2l-ai/d2l-zh','_blank')" style="cursor:pointer">
+        <rect x="505" y="663" width="190" height="74" rx="3" fill="rgba(7,7,15,0.97)"/>
+        <foreignObject x="505" y="663" width="190" height="74">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card clickable">
+            <div class="card-tag">D2L · 计算</div>
+            <div class="card-title">d2l 第5章 深度学习计算</div>
+          </div>
+        </foreignObject>
+      </g>
+
+      <!-- ══ SPLIT  cy=600  (63px above card04 top) ══ -->
+      <circle cx="600" cy="600" r="4" fill="#080808" stroke="rgba(196,170,110,0.4)" stroke-width="1.5"/>
+
+      <!-- ══ LEFT BRANCH  经典机器学习 · Amber ══ -->
+
+      <!-- split→AI  ends at AI card bottom-center (100,497) -->
+      <path d="M 600 600 C 380 600 100 565 100 497"
+            stroke="#F59E0B" stroke-width="1.5" fill="none" opacity="0.7"/>
+      <g onclick="window.open('https://github.com/microsoft/AI-For-Beginners','_blank')" style="cursor:pointer">
+        <rect x="5" y="423" width="190" height="74" rx="3" fill="rgba(7,7,15,0.97)"/>
+        <foreignObject x="5" y="423" width="190" height="74">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card clickable branch-l">
+            <div class="card-tag">AI · 入门</div>
+            <div class="card-title">AI-For-Beginners</div>
+          </div>
+        </foreignObject>
+      </g>
+
+      <!-- AI top-center(100,423) → Kaggle bottom-center(100,337) -->
+      <line x1="100" y1="423" x2="100" y2="337"
+            stroke="#F59E0B" stroke-width="1" opacity="0.4"/>
+      <g onclick="window.open('https://www.kaggle.com/','_blank')" style="cursor:pointer">
+        <rect x="5" y="263" width="190" height="74" rx="3" fill="rgba(7,7,15,0.97)"/>
+        <foreignObject x="5" y="263" width="190" height="74">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card clickable secondary branch-l">
+            <div class="card-tag">项目</div>
+            <div class="card-title">终点项目·Kaggle表格赛</div>
+          </div>
+        </foreignObject>
+      </g>
+
+      <!-- ══ CENTER BRANCH  计算机视觉 · Teal ══ -->
+
+      <!-- vertical line split→top  x=600  y=600→113  (cards cover it within bounds) -->
+      <line x1="600" y1="600" x2="600" y2="113"
+            stroke="#22D3EE" stroke-width="1.8" opacity="0.5"/>
+
+      <!-- CNN  cx=600 cy=470  card x=505 y=433  visible gap above: 600-507=93px -->
+      <g onclick="window.open('https://github.com/d2l-ai/d2l-zh','_blank')" style="cursor:pointer">
+        <rect x="505" y="433" width="190" height="74" rx="3" fill="rgba(7,7,15,0.97)"/>
+        <foreignObject x="505" y="433" width="190" height="74">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card clickable branch-c">
+            <div class="card-tag">D2L · CNN</div>
+            <div class="card-title">d2l 第6-7章 CNN专项</div>
+          </div>
+        </foreignObject>
+      </g>
+
+      <!-- CS231n  cx=600 cy=310  card x=505 y=273  visible gap: 433-347=86px -->
+      <g onclick="window.open('https://cs231n.stanford.edu/','_blank')" style="cursor:pointer">
+        <rect x="505" y="273" width="190" height="74" rx="3" fill="rgba(7,7,15,0.97)"/>
+        <foreignObject x="505" y="273" width="190" height="74">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card clickable branch-c">
+            <div class="card-tag">Stanford</div>
+            <div class="card-title">Stanford CS231n</div>
+          </div>
+        </foreignObject>
+      </g>
+
+      <!-- CS231n 作业  cx=600 cy=150  card x=505 y=113  visible gap: 273-187=86px -->
+      <g onclick="window.open('https://cs231n.github.io/','_blank')" style="cursor:pointer">
+        <rect x="505" y="113" width="190" height="74" rx="3" fill="rgba(7,7,15,0.97)"/>
+        <foreignObject x="505" y="113" width="190" height="74">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card clickable secondary branch-c">
+            <div class="card-tag">作业</div>
+            <div class="card-title">CS231n 五次作业</div>
+          </div>
+        </foreignObject>
+      </g>
+
+      <!-- ══ RIGHT BRANCH  NLP/大模型 · Fuchsia ══ -->
+
+      <!-- split→RNN  ends at RNN card bottom-center (990,497) -->
+      <path d="M 600 600 C 820 600 990 565 990 497"
+            stroke="#E879F9" stroke-width="1.8" fill="none" opacity="0.85"/>
+      <g onclick="window.open('https://github.com/d2l-ai/d2l-zh','_blank')" style="cursor:pointer">
+        <rect x="895" y="423" width="190" height="74" rx="3" fill="rgba(7,7,15,0.97)"/>
+        <foreignObject x="895" y="423" width="190" height="74">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card clickable branch-r">
+            <div class="card-tag">D2L · RNN</div>
+            <div class="card-title">d2l 第8-9章 RNN专项</div>
+          </div>
+        </foreignObject>
+      </g>
+      <!-- junction dot at RNN top-center, drawn after card so it's visible -->
+      <circle cx="990" cy="423" r="3" fill="#E879F9" opacity="0.7"/>
+
+      <!-- RNN top-center(990,423)→注意力 bottom-center(840,337) -->
+      <path d="M 990 423 C 990 385 840 380 840 337"
+            stroke="#E879F9" stroke-width="1.4" fill="none" opacity="0.65"/>
+      <g onclick="window.open('https://github.com/d2l-ai/d2l-zh','_blank')" style="cursor:pointer">
+        <rect x="745" y="263" width="190" height="74" rx="3" fill="rgba(7,7,15,0.97)"/>
+        <foreignObject x="745" y="263" width="190" height="74">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card clickable branch-r">
+            <div class="card-tag">D2L · 注意力</div>
+            <div class="card-title">d2l 注意力+BERT</div>
+          </div>
+        </foreignObject>
+      </g>
+
+      <!-- RNN top-center(990,423)→CS336 bottom-center(1100,337) -->
+      <path d="M 990 423 C 990 385 1100 380 1100 337"
+            stroke="#E879F9" stroke-width="1.4" fill="none" opacity="0.65"/>
+      <g onclick="window.open('https://cs336.stanford.edu/spring2025/','_blank')" style="cursor:pointer">
+        <rect x="1005" y="263" width="190" height="74" rx="3" fill="rgba(7,7,15,0.97)"/>
+        <foreignObject x="1005" y="263" width="190" height="74">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card clickable branch-r">
+            <div class="card-tag">Stanford</div>
+            <div class="card-title">Stanford CS336</div>
+          </div>
+        </foreignObject>
+      </g>
+
+      <!-- CS336 top-center(1100,263)→作业 bottom-center(1100,177) -->
+      <line x1="1100" y1="263" x2="1100" y2="177"
+            stroke="#E879F9" stroke-width="1" opacity="0.4"/>
+      <!-- CS336作业  cx=1100 cy=140  card x=1005 y=103 -->
+      <circle cx="1100" cy="140" r="3.5" fill="#080808" stroke="#E879F9" stroke-width="1.1" opacity="0.55"/>
+      <g onclick="window.open('https://cs336.stanford.edu/spring2025/','_blank')" style="cursor:pointer">
+        <rect x="1005" y="103" width="190" height="74" rx="3" fill="rgba(7,7,15,0.97)"/>
+        <foreignObject x="1005" y="103" width="190" height="74">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card clickable secondary branch-r">
+            <div class="card-tag">作业</div>
+            <div class="card-title">CS336 五次作业</div>
+          </div>
+        </foreignObject>
+      </g>
+
     </svg>
+
+    <!-- Tools & Resources table -->
+    <div id="tools-table">
+      <h3 class="tools-title">配套工具 &amp; 参考资源</h3>
+      <table class="tools-grid">
+        <thead>
+          <tr>
+            <th>名称</th>
+            <th>类型</th>
+            <th>说明</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><a href="https://github.com/leehanchung/awesome-full-stack-machine-learning-courses" target="_blank">awesome-full-stack-ml</a></td>
+            <td class="type-tag">资源合集</td>
+            <td>精选全栈机器学习课程与实战项目列表，适合规划学习路径、横向比较各方向资源</td>
+          </tr>
+          <tr>
+            <td><a href="https://github.com/lukasmasuch/best-of-ml-python" target="_blank">best-of-ml-python</a></td>
+            <td class="type-tag">库排行</td>
+            <td>Python ML 生态中最受欢迎的工具库排行榜，按类别分类，选型时可快速定位主流方案</td>
+          </tr>
+          <tr>
+            <td><a href="https://github.com/raimbekovm/cs231n-2025-notes" target="_blank">cs231n-2025-notes</a></td>
+            <td class="type-tag">学习笔记</td>
+            <td>CS231n 2025 版社区整理的课程笔记，覆盖课件重点与作业提示，配合正课复习效果最佳</td>
+          </tr>
+          <tr>
+            <td><a href="https://arxiv.org/abs/1706.03762" target="_blank">Attention is All You Need</a></td>
+            <td class="type-tag">原始论文</td>
+            <td>Transformer 架构奠基论文，NLP 与大模型必读；建议学完 d2l 注意力章节后精读，对照理解原理</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </section>
 
   <footer>
@@ -576,7 +825,7 @@
 
   <nav id="page-dots">
     <button class="page-dot active" data-page="0" aria-label="时间线"></button>
-    <button class="page-dot"        data-page="1" aria-label="知识树"></button>
+    <button class="page-dot"        data-page="1" aria-label="学习树"></button>
   </nav>
 
 </div>
@@ -849,11 +1098,22 @@ function goToPage(idx) {
   if (!_pages[idx]) return;
   _app.scrollTo({ top: _pages[idx].offsetTop, behavior: 'smooth' });
 }
+const _dotsNav = document.getElementById('page-dots');
+function updatePageState(idx) {
+  _dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+  _dotsNav.classList.toggle('visible', idx > 0);
+}
 _dots.forEach(d => d.addEventListener('click', () => goToPage(+d.dataset.page)));
 _app.addEventListener('scroll', () => {
   const idx = Math.round(_app.scrollTop / window.innerHeight);
-  _dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+  updatePageState(idx);
 }, { passive: true });
+updatePageState(0);
+
+// Number tree nodes in document order
+document.querySelectorAll('#tree-svg foreignObject .card-tag').forEach((el, i) => {
+  el.textContent = String(i + 1).padStart(2, '0') + ' · ' + el.textContent;
+});
 </script>
 </body>
 </html>
