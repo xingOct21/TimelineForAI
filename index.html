@@ -244,24 +244,6 @@
     #lang-btns .btn { font-size: 10px; letter-spacing: 2px; }
     #lang-btns:hover .btn:not([class*="active"]) { max-width: 80px; padding: 6px 10px; }
 
-    /* ── Progress bar ── */
-    #progress-wrap {
-      flex-shrink: 0;
-      height: 22px; padding: 0 24px;
-      display: flex; align-items: center; gap: 10px;
-      opacity: 0; transition: opacity 0.2s;
-    }
-    #progress-wrap.visible { opacity: 1; }
-    #progress-bar-bg {
-      flex: 1; height: 2px;
-      background: rgba(0,255,240,0.1); border-radius: 2px; overflow: hidden;
-    }
-    #progress-bar-fill {
-      height: 100%; width: 0%; background: var(--cyan);
-      box-shadow: var(--glow-c); transition: width 0.1s;
-    }
-    #progress-label { font-size: 9px; letter-spacing: 2px; color: var(--muted); white-space: nowrap; }
-
     /* ── Horizontal divider ── */
     .h-rule {
       flex-shrink: 0; margin: 0 24px;
@@ -434,7 +416,6 @@
       color: rgba(196,170,110,0.5);
       font-family: 'Courier New', monospace;
     }
-    .card-slot { flex: 1; }
     .card-title {
       font-size: 14px;
       color: rgba(196,170,110,0.88);
@@ -535,12 +516,6 @@
     <span class="track-hint">← 鼠标悬停这里以切换</span>
   </div>
 
-  <!-- Translation progress -->
-  <div id="progress-wrap">
-    <div id="progress-bar-bg"><div id="progress-bar-fill"></div></div>
-    <div id="progress-label">TRANSLATING 0/0</div>
-  </div>
-
   <div class="h-rule"></div>
 
   <!-- Timeline -->
@@ -557,7 +532,7 @@
 
   <!-- Tree CTA -->
   <button id="tree-cta" onclick="goToPage(1)" aria-label="进入AI学习树">
-    <span class="cta-label">点击进入 AI 学习树</span>
+    <span id="cta-label" class="cta-label">点击进入 AI 学习树</span>
     <span class="cta-arrow">⌄</span>
   </button>
   </div><!-- /page-timeline -->
@@ -565,7 +540,7 @@
   <div id="page-tree">
   <!-- Knowledge Tree -->
   <section id="tree-section">
-    <h2 class="tree-title">学习树</h2>
+    <h2 id="tree-title" class="tree-title">学习树</h2>
     <svg id="tree-svg" viewBox="0 0 1200 1160" xmlns="http://www.w3.org/2000/svg">
 
       <!--
@@ -586,19 +561,19 @@
       <!-- ══ LEGEND ══ -->
       <line x1="20" y1="26" x2="58" y2="26" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round"/>
       <circle cx="39" cy="26" r="3.5" fill="#F59E0B" opacity="0.85"/>
-      <text x="66" y="31" fill="rgba(245,158,11,0.82)" font-family="'Courier New',monospace" font-size="12" letter-spacing="1">经典机器学习</text>
+      <text id="legend-ml" x="66" y="31" fill="rgba(245,158,11,0.82)" font-family="'Courier New',monospace" font-size="12" letter-spacing="1">经典机器学习</text>
 
       <line x1="20" y1="57" x2="58" y2="57" stroke="#22D3EE" stroke-width="2.5" stroke-linecap="round"/>
       <circle cx="39" cy="57" r="3.5" fill="#22D3EE" opacity="0.85"/>
-      <text x="66" y="62" fill="rgba(34,211,238,0.82)" font-family="'Courier New',monospace" font-size="12" letter-spacing="1">计算机视觉</text>
+      <text id="legend-cv" x="66" y="62" fill="rgba(34,211,238,0.82)" font-family="'Courier New',monospace" font-size="12" letter-spacing="1">计算机视觉</text>
 
       <line x1="20" y1="88" x2="58" y2="88" stroke="#E879F9" stroke-width="2.5" stroke-linecap="round"/>
       <circle cx="39" cy="88" r="3.5" fill="#E879F9" opacity="0.85"/>
-      <text x="66" y="93" fill="rgba(232,121,249,0.82)" font-family="'Courier New',monospace" font-size="12" letter-spacing="1">NLP / 大模型</text>
+      <text id="legend-nlp" x="66" y="93" fill="rgba(232,121,249,0.82)" font-family="'Courier New',monospace" font-size="12" letter-spacing="1">NLP / 大模型</text>
 
       <!-- ══ ROOT ══ -->
       <circle class="tree-root-ring" cx="600" cy="1100" r="13" fill="none" stroke="#c4aa6e" stroke-width="1"/>
-      <text x="600" y="1128" text-anchor="middle" fill="rgba(196,170,110,0.42)"
+      <text id="tree-root-text" x="600" y="1128" text-anchor="middle" fill="rgba(196,170,110,0.42)"
             font-family="'Courier New',monospace" font-size="13" letter-spacing="1.5">基础准备 · Python / 线代 / 概率统计</text>
       <circle class="tree-root-dot" cx="600" cy="1100" r="5" fill="#080808" stroke="#c4aa6e" stroke-width="1.5"/>
 
@@ -610,8 +585,8 @@
         <rect x="505" y="963" width="190" height="74" rx="3" fill="rgba(7,7,15,0.97)"/>
         <foreignObject x="505" y="963" width="190" height="74">
           <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card clickable">
-            <div class="card-tag">ML · 入门</div>
-            <div class="card-title">ML-For-Beginners</div>
+            <div id="n01-tag" class="card-tag">ML · 入门</div>
+            <div id="n01-title" class="card-title">ML-For-Beginners</div>
           </div>
         </foreignObject>
       </g>
@@ -621,8 +596,8 @@
         <rect x="505" y="863" width="190" height="74" rx="3" fill="rgba(7,7,15,0.97)"/>
         <foreignObject x="505" y="863" width="190" height="74">
           <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card clickable">
-            <div class="card-tag">D2L · 预备</div>
-            <div class="card-title">d2l 第1-2章 预备知识</div>
+            <div id="n02-tag" class="card-tag">D2L · 预备</div>
+            <div id="n02-title" class="card-title">d2l 第1-2章 预备知识</div>
           </div>
         </foreignObject>
       </g>
@@ -632,8 +607,8 @@
         <rect x="505" y="763" width="190" height="74" rx="3" fill="rgba(7,7,15,0.97)"/>
         <foreignObject x="505" y="763" width="190" height="74">
           <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card clickable">
-            <div class="card-tag">D2L · 线性/MLP</div>
-            <div class="card-title">d2l 第3-4章 线性/MLP</div>
+            <div id="n03-tag" class="card-tag">D2L · 线性/MLP</div>
+            <div id="n03-title" class="card-title">d2l 第3-4章 线性/MLP</div>
           </div>
         </foreignObject>
       </g>
@@ -643,8 +618,8 @@
         <rect x="505" y="663" width="190" height="74" rx="3" fill="rgba(7,7,15,0.97)"/>
         <foreignObject x="505" y="663" width="190" height="74">
           <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card clickable">
-            <div class="card-tag">D2L · 计算</div>
-            <div class="card-title">d2l 第5章 深度学习计算</div>
+            <div id="n04-tag" class="card-tag">D2L · 计算</div>
+            <div id="n04-title" class="card-title">d2l 第5章 深度学习计算</div>
           </div>
         </foreignObject>
       </g>
@@ -661,8 +636,8 @@
         <rect x="5" y="423" width="190" height="74" rx="3" fill="rgba(7,7,15,0.97)"/>
         <foreignObject x="5" y="423" width="190" height="74">
           <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card clickable branch-l">
-            <div class="card-tag">AI · 入门</div>
-            <div class="card-title">AI-For-Beginners</div>
+            <div id="l01-tag" class="card-tag">AI · 入门</div>
+            <div id="l01-title" class="card-title">AI-For-Beginners</div>
           </div>
         </foreignObject>
       </g>
@@ -674,8 +649,8 @@
         <rect x="5" y="263" width="190" height="74" rx="3" fill="rgba(7,7,15,0.97)"/>
         <foreignObject x="5" y="263" width="190" height="74">
           <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card clickable secondary branch-l">
-            <div class="card-tag">项目</div>
-            <div class="card-title">终点项目·Kaggle表格赛</div>
+            <div id="l02-tag" class="card-tag">项目</div>
+            <div id="l02-title" class="card-title">终点项目·Kaggle表格赛</div>
           </div>
         </foreignObject>
       </g>
@@ -691,8 +666,8 @@
         <rect x="505" y="433" width="190" height="74" rx="3" fill="rgba(7,7,15,0.97)"/>
         <foreignObject x="505" y="433" width="190" height="74">
           <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card clickable branch-c">
-            <div class="card-tag">D2L · CNN</div>
-            <div class="card-title">d2l 第6-7章 CNN专项</div>
+            <div id="c01-tag" class="card-tag">D2L · CNN</div>
+            <div id="c01-title" class="card-title">d2l 第6-7章 CNN专项</div>
           </div>
         </foreignObject>
       </g>
@@ -702,8 +677,8 @@
         <rect x="505" y="273" width="190" height="74" rx="3" fill="rgba(7,7,15,0.97)"/>
         <foreignObject x="505" y="273" width="190" height="74">
           <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card clickable branch-c">
-            <div class="card-tag">Stanford</div>
-            <div class="card-title">Stanford CS231n</div>
+            <div id="c02-tag" class="card-tag">Stanford</div>
+            <div id="c02-title" class="card-title">Stanford CS231n</div>
           </div>
         </foreignObject>
       </g>
@@ -713,8 +688,8 @@
         <rect x="505" y="113" width="190" height="74" rx="3" fill="rgba(7,7,15,0.97)"/>
         <foreignObject x="505" y="113" width="190" height="74">
           <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card clickable secondary branch-c">
-            <div class="card-tag">作业</div>
-            <div class="card-title">CS231n 五次作业</div>
+            <div id="c03-tag" class="card-tag">作业</div>
+            <div id="c03-title" class="card-title">CS231n 五次作业</div>
           </div>
         </foreignObject>
       </g>
@@ -728,8 +703,8 @@
         <rect x="895" y="423" width="190" height="74" rx="3" fill="rgba(7,7,15,0.97)"/>
         <foreignObject x="895" y="423" width="190" height="74">
           <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card clickable branch-r">
-            <div class="card-tag">D2L · RNN</div>
-            <div class="card-title">d2l 第8-9章 RNN专项</div>
+            <div id="r01-tag" class="card-tag">D2L · RNN</div>
+            <div id="r01-title" class="card-title">d2l 第8-9章 RNN专项</div>
           </div>
         </foreignObject>
       </g>
@@ -743,8 +718,8 @@
         <rect x="745" y="263" width="190" height="74" rx="3" fill="rgba(7,7,15,0.97)"/>
         <foreignObject x="745" y="263" width="190" height="74">
           <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card clickable branch-r">
-            <div class="card-tag">D2L · 注意力</div>
-            <div class="card-title">d2l 注意力+BERT</div>
+            <div id="r02-tag" class="card-tag">D2L · 注意力</div>
+            <div id="r02-title" class="card-title">d2l 注意力+BERT</div>
           </div>
         </foreignObject>
       </g>
@@ -756,8 +731,8 @@
         <rect x="1005" y="263" width="190" height="74" rx="3" fill="rgba(7,7,15,0.97)"/>
         <foreignObject x="1005" y="263" width="190" height="74">
           <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card clickable branch-r">
-            <div class="card-tag">Stanford</div>
-            <div class="card-title">Stanford CS336</div>
+            <div id="r03-tag" class="card-tag">Stanford</div>
+            <div id="r03-title" class="card-title">Stanford CS336</div>
           </div>
         </foreignObject>
       </g>
@@ -771,8 +746,8 @@
         <rect x="1005" y="103" width="190" height="74" rx="3" fill="rgba(7,7,15,0.97)"/>
         <foreignObject x="1005" y="103" width="190" height="74">
           <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card clickable secondary branch-r">
-            <div class="card-tag">作业</div>
-            <div class="card-title">CS336 五次作业</div>
+            <div id="r04-tag" class="card-tag">作业</div>
+            <div id="r04-title" class="card-title">CS336 五次作业</div>
           </div>
         </foreignObject>
       </g>
@@ -781,35 +756,35 @@
 
     <!-- Tools & Resources table -->
     <div id="tools-table">
-      <h3 class="tools-title">配套工具 &amp; 参考资源</h3>
+      <h3 id="tools-title" class="tools-title">配套工具 &amp; 参考资源</h3>
       <table class="tools-grid">
         <thead>
           <tr>
-            <th>名称</th>
-            <th>类型</th>
-            <th>说明</th>
+            <th id="tools-th-name">名称</th>
+            <th id="tools-th-type">类型</th>
+            <th id="tools-th-desc">说明</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td><a href="https://github.com/leehanchung/awesome-full-stack-machine-learning-courses" target="_blank">awesome-full-stack-ml</a></td>
-            <td class="type-tag">资源合集</td>
-            <td>精选全栈机器学习课程与实战项目列表，适合规划学习路径、横向比较各方向资源</td>
+            <td id="tools-t1-type" class="type-tag">资源合集</td>
+            <td id="tools-t1-desc">精选全栈机器学习课程与实战项目列表，适合规划学习路径、横向比较各方向资源</td>
           </tr>
           <tr>
             <td><a href="https://github.com/lukasmasuch/best-of-ml-python" target="_blank">best-of-ml-python</a></td>
-            <td class="type-tag">库排行</td>
-            <td>Python ML 生态中最受欢迎的工具库排行榜，按类别分类，选型时可快速定位主流方案</td>
+            <td id="tools-t2-type" class="type-tag">库排行</td>
+            <td id="tools-t2-desc">Python ML 生态中最受欢迎的工具库排行榜，按类别分类，选型时可快速定位主流方案</td>
           </tr>
           <tr>
             <td><a href="https://github.com/raimbekovm/cs231n-2025-notes" target="_blank">cs231n-2025-notes</a></td>
-            <td class="type-tag">学习笔记</td>
-            <td>CS231n 2025 版社区整理的课程笔记，覆盖课件重点与作业提示，配合正课复习效果最佳</td>
+            <td id="tools-t3-type" class="type-tag">学习笔记</td>
+            <td id="tools-t3-desc">CS231n 2025 版社区整理的课程笔记，覆盖课件重点与作业提示，配合正课复习效果最佳</td>
           </tr>
           <tr>
             <td><a href="https://arxiv.org/abs/1706.03762" target="_blank">Attention is All You Need</a></td>
-            <td class="type-tag">原始论文</td>
-            <td>Transformer 架构奠基论文，NLP 与大模型必读；建议学完 d2l 注意力章节后精读，对照理解原理</td>
+            <td id="tools-t4-type" class="type-tag">原始论文</td>
+            <td id="tools-t4-desc">Transformer 架构奠基论文，NLP 与大模型必读；建议学完 d2l 注意力章节后精读，对照理解原理</td>
           </tr>
         </tbody>
       </table>
@@ -818,7 +793,6 @@
 
   <footer>
     <a href="https://timeline.knightlab.com/" target="_blank">TIMELINE.JS</a> ·
-    TRANSLATION: <a href="https://mymemory.translated.net/" target="_blank">MYMEMORY API</a> ·
     IMAGES: <a href="https://commons.wikimedia.org/" target="_blank">WIKIMEDIA COMMONS</a>
   </footer>
   </div><!-- /page-tree -->
@@ -834,140 +808,35 @@
 // ── State ────────────────────────────────────────────────────────────────────
 let currentTrack = 'ai';
 let currentLang  = 'zh';
-const CACHE_PREFIX = 'aitl2_';
-
-// ── Translation Engine ────────────────────────────────────────────────────────
-
-// Cache key: "aitl2_en_ai"  → JSON { "0.headline": "...", "0.text": "...", ... }
-function getCacheKey(lang, track) { return `${CACHE_PREFIX}${lang}_${track}`; }
-
-function loadCache(lang, track) {
-  try { return JSON.parse(localStorage.getItem(getCacheKey(lang, track)) || 'null'); }
-  catch { return null; }
-}
-
-function saveCache(lang, track, data) {
-  try { localStorage.setItem(getCacheKey(lang, track), JSON.stringify(data)); }
-  catch {}
-}
-
-// MyMemory langpair codes
-const LANG_PAIR = { en: 'zh-CN|en-GB', ja: 'zh-CN|ja' };
-
-async function fetchTranslation(text, lang) {
-  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${LANG_PAIR[lang]}`;
-  const r = await fetch(url);
-  if (!r.ok) return text;
-  const d = await r.json();
-  if (d.responseStatus !== 200) return text;
-  const t = d.responseData.translatedText;
-  // MyMemory returns warning strings when rate-limited
-  if (t && !t.startsWith('MYMEMORY WARNING')) return t;
-  return text;
-}
-
-// Translate all text fields for a track, with concurrency=4 and progress bar
-async function translateTrack(lang, track) {
-  const cached = loadCache(lang, track);
-  if (cached) return cached;
-
-  const src = TRACKS[track];
-  const items = [
-    { key:'title.headline', text: src.titleHeadline },
-    { key:'title.text',     text: src.titleText },
-    // figure roles (shared across tracks, cache under track='__figs')
-  ];
-  src.events.forEach((e, i) => {
-    items.push({ key:`${i}.headline`, text: e.headline });
-    items.push({ key:`${i}.text`,     text: e.text });
-    if (e.imgCaption) items.push({ key:`${i}.cap`, text: e.imgCaption });
-  });
-
-  const total   = items.length;
-  let   done    = 0;
-  const result  = {};
-
-  showProgress(0, total);
-
-  // Process in batches of 4 (rate-limit friendly)
-  for (let i = 0; i < items.length; i += 4) {
-    const batch = items.slice(i, i + 4);
-    await Promise.all(batch.map(async item => {
-      result[item.key] = await fetchTranslation(item.text, lang);
-      done++;
-      showProgress(done, total);
-    }));
-    if (i + 4 < items.length) await sleep(220);
-  }
-
-  saveCache(lang, track, result);
-  return result;
-}
-
-// Translate figure roles (shared, cached under a special key)
-async function translateFigureRoles(lang) {
-  const key = `${CACHE_PREFIX}${lang}__figs`;
-  try {
-    const c = localStorage.getItem(key);
-    if (c) return JSON.parse(c);
-  } catch {}
-
-  const results = {};
-  for (let i = 0; i < FIGURES.length; i += 4) {
-    const batch = FIGURES.slice(i, i + 4);
-    await Promise.all(batch.map(async (f, bi) => {
-      results[i + bi] = await fetchTranslation(f.roleZh, lang);
-    }));
-    if (i + 4 < FIGURES.length) await sleep(220);
-  }
-
-  try { localStorage.setItem(key, JSON.stringify(results)); } catch {}
-  return results;
-}
-
-// ── UI Helpers ────────────────────────────────────────────────────────────────
-
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-function showProgress(done, total) {
-  const wrap  = document.getElementById('progress-wrap');
-  const fill  = document.getElementById('progress-bar-fill');
-  const label = document.getElementById('progress-label');
-  wrap.classList.add('visible');
-  fill.style.width = `${Math.round((done / total) * 100)}%`;
-  label.textContent = `TRANSLATING ${done}/${total}`;
-  if (done >= total) {
-    setTimeout(() => wrap.classList.remove('visible'), 800);
-  }
-}
 
 // ── Timeline Builder ──────────────────────────────────────────────────────────
 
-function buildTLData(track, translations) {
-  const src  = TRACKS[track];
-  const t    = translations || {};
+function buildTLData(track, lang) {
+  const src = TRACKS[track];
+  const tl  = (lang !== 'zh' && src[lang]) ? src[lang] : {};
   const data = {
     title: {
       text: {
-        headline: t['title.headline'] || src.titleHeadline,
-        text: `<p>${t['title.text'] || src.titleText}</p>`
+        headline: tl.titleHeadline || src.titleHeadline,
+        text: `<p>${tl.titleText || src.titleText}</p>`
       }
     },
-    events: src.events.map((e, i) => {
+    events: src.events.map(e => {
+      const et = (lang !== 'zh' && e[lang]) ? e[lang] : {};
       const wikiLink = e.wikiUrl
         ? `<p style="margin-top:8px"><a href="${e.wikiUrl}" target="_blank" rel="noopener" style="font-size:0.8em;opacity:0.55;letter-spacing:1px">Wikipedia ↗</a></p>`
         : '';
       const ev = {
         start_date: { year: e.year, ...(e.month ? { month: e.month } : {}) },
         text: {
-          headline: t[`${i}.headline`] || e.headline,
-          text: `<p>${t[`${i}.text`] || e.text}</p>${wikiLink}`
+          headline: et.headline || e.headline,
+          text: `<p>${et.text || e.text}</p>${wikiLink}`
         }
       };
       if (e.img) {
         ev.media = {
           url: e.img,
-          caption: t[`${i}.cap`] || e.imgCaption || '',
+          caption: e.imgCaption || '',
           link: e.wikiUrl || '',
           link_target: '_blank'
         };
@@ -998,14 +867,12 @@ function renderTimeline(data) {
 
 // ── Gallery ───────────────────────────────────────────────────────────────────
 
-function renderGallery(lang, figureRoles) {
+function renderGallery(lang) {
   const nameKey = lang === 'en' ? 'nameEn' : lang === 'ja' ? 'nameJa' : 'nameZh';
+  const roleKey = lang === 'en' ? 'roleEn' : lang === 'ja' ? 'roleJa' : 'roleZh';
 
-  // Build cards (doubled for seamless loop)
-  const cards = [...FIGURES, ...FIGURES].map((f, i) => {
-    const role = figureRoles && figureRoles[i % FIGURES.length]
-      ? figureRoles[i % FIGURES.length]
-      : f.roleZh;
+  const cards = [...FIGURES, ...FIGURES].map(f => {
+    const role = f[roleKey] || f.roleZh;
     const initial = f[nameKey].replace(/[\s·]/g,'').charAt(0);
     const imgHtml = f.img
       ? `<img class="fig-img" src="${f.img}" alt="${f[nameKey]}" loading="lazy" onerror="this.style.display='none'">`
@@ -1045,8 +912,9 @@ function selectLang(lang) {
   });
   document.documentElement.lang = lang === 'zh' ? 'zh' : lang;
   updateHeader(lang);
+  applyUILang(lang);
   load(currentTrack, lang);
-  refreshGallery(lang);
+  renderGallery(lang);
 }
 
 const HEADER_TEXT = {
@@ -1063,30 +931,109 @@ function updateHeader(lang) {
   document.querySelector('.track-hint').textContent = h.hint;
 }
 
-// ── Main Load ─────────────────────────────────────────────────────────────────
+// ── Tree UI Translations ──────────────────────────────────────────────────────
 
-async function load(track, lang) {
-  let translations = null;
-
-  if (lang !== 'zh') {
-    translations = await translateTrack(lang, track);
+const UI_TEXT = {
+  zh: {
+    'tree-title':'学习树','legend-ml':'经典机器学习','legend-cv':'计算机视觉','legend-nlp':'NLP / 大模型',
+    'tree-root-text':'基础准备 · Python / 线代 / 概率统计',
+    'n01-tag':'ML · 入门','n01-title':'ML-For-Beginners',
+    'n02-tag':'D2L · 预备','n02-title':'d2l 第1-2章 预备知识',
+    'n03-tag':'D2L · 线性/MLP','n03-title':'d2l 第3-4章 线性/MLP',
+    'n04-tag':'D2L · 计算','n04-title':'d2l 第5章 深度学习计算',
+    'l01-tag':'AI · 入门','l01-title':'AI-For-Beginners',
+    'l02-tag':'项目','l02-title':'终点项目·Kaggle表格赛',
+    'c01-tag':'D2L · CNN','c01-title':'d2l 第6-7章 CNN专项',
+    'c02-tag':'Stanford','c02-title':'Stanford CS231n',
+    'c03-tag':'作业','c03-title':'CS231n 五次作业',
+    'r01-tag':'D2L · RNN','r01-title':'d2l 第8-9章 RNN专项',
+    'r02-tag':'D2L · 注意力','r02-title':'d2l 注意力+BERT',
+    'r03-tag':'Stanford','r03-title':'Stanford CS336',
+    'r04-tag':'作业','r04-title':'CS336 五次作业',
+    'tools-title':'配套工具 & 参考资源',
+    'tools-th-name':'名称','tools-th-type':'类型','tools-th-desc':'说明',
+    'tools-t1-type':'资源合集','tools-t1-desc':'精选全栈机器学习课程与实战项目列表，适合规划学习路径、横向比较各方向资源',
+    'tools-t2-type':'库排行','tools-t2-desc':'Python ML 生态中最受欢迎的工具库排行榜，按类别分类，选型时可快速定位主流方案',
+    'tools-t3-type':'学习笔记','tools-t3-desc':'CS231n 2025 版社区整理的课程笔记，覆盖课件重点与作业提示，配合正课复习效果最佳',
+    'tools-t4-type':'原始论文','tools-t4-desc':'Transformer 架构奠基论文，NLP 与大模型必读；建议学完 d2l 注意力章节后精读，对照理解原理',
+    'cta-label':'点击进入 AI 学习树',
+    'dot-0':'时间线','dot-1':'学习树'
+  },
+  en: {
+    'tree-title':'Learning Tree','legend-ml':'Classic Machine Learning','legend-cv':'Computer Vision','legend-nlp':'NLP / Large Models',
+    'tree-root-text':'Foundation · Python / Linear Algebra / Probability',
+    'n01-tag':'ML · Intro','n01-title':'ML-For-Beginners',
+    'n02-tag':'D2L · Prep','n02-title':'d2l Ch.1-2 Fundamentals',
+    'n03-tag':'D2L · Linear/MLP','n03-title':'d2l Ch.3-4 Linear/MLP',
+    'n04-tag':'D2L · Compute','n04-title':'d2l Ch.5 Deep Learning Computation',
+    'l01-tag':'AI · Intro','l01-title':'AI-For-Beginners',
+    'l02-tag':'Project','l02-title':'Final Project · Kaggle Tabular',
+    'c01-tag':'D2L · CNN','c01-title':'d2l Ch.6-7 CNN Focus',
+    'c02-tag':'Stanford','c02-title':'Stanford CS231n',
+    'c03-tag':'Assignments','c03-title':'CS231n 5 Assignments',
+    'r01-tag':'D2L · RNN','r01-title':'d2l Ch.8-9 RNN Focus',
+    'r02-tag':'D2L · Attention','r02-title':'d2l Attention + BERT',
+    'r03-tag':'Stanford','r03-title':'Stanford CS336',
+    'r04-tag':'Assignments','r04-title':'CS336 5 Assignments',
+    'tools-title':'Tools & Reference Resources',
+    'tools-th-name':'Name','tools-th-type':'Type','tools-th-desc':'Description',
+    'tools-t1-type':'Resource List','tools-t1-desc':'A curated list of full-stack ML courses and hands-on projects, ideal for planning a learning path and comparing resources across directions.',
+    'tools-t2-type':'Library Ranking','tools-t2-desc':'Rankings of the most popular Python ML libraries by category, making it easy to identify mainstream tools when choosing.',
+    'tools-t3-type':'Study Notes','tools-t3-desc':'Community-compiled course notes for CS231n 2025, covering lecture highlights and assignment hints. Best used alongside the main course for review.',
+    'tools-t4-type':'Original Paper','tools-t4-desc':'The foundational Transformer paper, essential for NLP and large models. Recommended after completing the d2l attention chapter.',
+    'cta-label':'Enter the AI Learning Tree',
+    'dot-0':'Timeline','dot-1':'Learning Tree'
+  },
+  ja: {
+    'tree-title':'学習ツリー','legend-ml':'古典的機械学習','legend-cv':'コンピュータビジョン','legend-nlp':'NLP / 大規模モデル',
+    'tree-root-text':'基礎準備・Python / 線形代数 / 確率統計',
+    'n01-tag':'ML・入門','n01-title':'ML-For-Beginners',
+    'n02-tag':'D2L・予備','n02-title':'d2l 第1-2章 予備知識',
+    'n03-tag':'D2L・線形/MLP','n03-title':'d2l 第3-4章 線形/MLP',
+    'n04-tag':'D2L・計算','n04-title':'d2l 第5章 深層学習計算',
+    'l01-tag':'AI・入門','l01-title':'AI-For-Beginners',
+    'l02-tag':'プロジェクト','l02-title':'最終プロジェクト・Kaggle表データ',
+    'c01-tag':'D2L・CNN','c01-title':'d2l 第6-7章 CNN専攻',
+    'c02-tag':'Stanford','c02-title':'Stanford CS231n',
+    'c03-tag':'課題','c03-title':'CS231n 5回の課題',
+    'r01-tag':'D2L・RNN','r01-title':'d2l 第8-9章 RNN専攻',
+    'r02-tag':'D2L・注意機構','r02-title':'d2l 注意機構+BERT',
+    'r03-tag':'Stanford','r03-title':'Stanford CS336',
+    'r04-tag':'課題','r04-title':'CS336 5回の課題',
+    'tools-title':'ツール & 参考資料',
+    'tools-th-name':'名称','tools-th-type':'種類','tools-th-desc':'説明',
+    'tools-t1-type':'リソース一覧','tools-t1-desc':'フルスタック機械学習コースと実践プロジェクトの厳選リスト。学習パスの計画や各分野のリソース比較に最適。',
+    'tools-t2-type':'ライブラリランキング','tools-t2-desc':'Python MLエコシステムの人気ライブラリランキング。カテゴリ別分類で、選定時に主流ツールを素早く特定できる。',
+    'tools-t3-type':'学習ノート','tools-t3-desc':'CS231n 2025のコミュニティ整理ノート。講義のポイントと課題ヒントを網羅。正規授業との併用復習に最適。',
+    'tools-t4-type':'原著論文','tools-t4-desc':'TransformerアーキテクチャのNLPと大規模モデル必読論文。d2lの注意機構章を学んだ後に精読し、原理を対照的に理解することを推奨。',
+    'cta-label':'AI学習ツリーへ',
+    'dot-0':'タイムライン','dot-1':'学習ツリー'
   }
+};
 
-  const data = buildTLData(track, translations);
-  renderTimeline(data);
+function applyUILang(lang) {
+  const t = UI_TEXT[lang] || UI_TEXT.zh;
+  Object.entries(t).forEach(([id, text]) => {
+    if (id.startsWith('dot-')) {
+      const dots = document.querySelectorAll('.page-dot');
+      const dot = dots[+id.slice(4)];
+      if (dot) dot.setAttribute('aria-label', text);
+      return;
+    }
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+  });
 }
 
-async function refreshGallery(lang) {
-  let roles = null;
-  if (lang !== 'zh') {
-    roles = await translateFigureRoles(lang);
-  }
-  renderGallery(lang, roles);
+// ── Main Load ─────────────────────────────────────────────────────────────────
+
+function load(track, lang) {
+  renderTimeline(buildTLData(track, lang));
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 document.querySelector('.track-hint').textContent = HEADER_TEXT['zh'].hint;
-renderGallery('zh', null);
+renderGallery('zh');
 load('ai', 'zh');
 
 // ── Page Navigation ────────────────────────────────────────────────────────────
@@ -1110,10 +1057,6 @@ _app.addEventListener('scroll', () => {
 }, { passive: true });
 updatePageState(0);
 
-// Number tree nodes in document order
-document.querySelectorAll('#tree-svg foreignObject .card-tag').forEach((el, i) => {
-  el.textContent = String(i + 1).padStart(2, '0') + ' · ' + el.textContent;
-});
 </script>
 </body>
 </html>
