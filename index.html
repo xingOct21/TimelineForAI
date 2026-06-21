@@ -541,7 +541,7 @@
   <!-- Knowledge Tree -->
   <section id="tree-section">
     <h2 id="tree-title" class="tree-title">学习树</h2>
-    <svg id="tree-svg" viewBox="0 0 1200 1160" xmlns="http://www.w3.org/2000/svg">
+    <svg id="tree-svg" viewBox="0 0 1200 1260" xmlns="http://www.w3.org/2000/svg">
 
       <!--
         card = 190×74.  cx/cy = card center.
@@ -549,7 +549,7 @@
         bot-mid  = (cx, cy+37)
         All lines/paths run only between card edges — never through card bodies.
 
-        Trunk cx=600:  cy 1000/900/800/700  split cy=600
+        Trunk cx=600:  cy 1100/1000/900/800/700  split cy=600
         Left  cx=100:  AI cy=460   Kaggle cy=300
         Center cx=600: CNN cy=470  CS231n cy=310  作業 cy=150
         Right: RNN cx=990 cy=460
@@ -572,13 +572,24 @@
       <text id="legend-nlp" x="66" y="93" fill="rgba(232,121,249,0.82)" font-family="'Courier New',monospace" font-size="12" letter-spacing="1">NLP / 大模型</text>
 
       <!-- ══ ROOT ══ -->
-      <circle class="tree-root-ring" cx="600" cy="1100" r="13" fill="none" stroke="#c4aa6e" stroke-width="1"/>
-      <text id="tree-root-text" x="600" y="1128" text-anchor="middle" fill="rgba(196,170,110,0.42)"
+      <circle class="tree-root-ring" cx="600" cy="1200" r="13" fill="none" stroke="#c4aa6e" stroke-width="1"/>
+      <text id="tree-root-text" x="600" y="1228" text-anchor="middle" fill="rgba(196,170,110,0.42)"
             font-family="'Courier New',monospace" font-size="13" letter-spacing="1.5">基础准备 · Python / 线代 / 概率统计</text>
-      <circle class="tree-root-dot" cx="600" cy="1100" r="5" fill="#080808" stroke="#c4aa6e" stroke-width="1.5"/>
+      <circle class="tree-root-dot" cx="600" cy="1200" r="5" fill="#080808" stroke="#c4aa6e" stroke-width="1.5"/>
 
       <!-- ══ TRUNK LINE  root→split ══ -->
-      <line x1="600" y1="1100" x2="600" y2="600" stroke="rgba(196,170,110,0.22)" stroke-width="2.5"/>
+      <line x1="600" y1="1200" x2="600" y2="600" stroke="rgba(196,170,110,0.22)" stroke-width="2.5"/>
+
+      <!-- ── N00  cy=1100  card y=1063-1137 ── -->
+      <g onclick="window.open('https://github.com/freeCodeCamp/freeCodeCamp','_blank')" style="cursor:pointer">
+        <rect x="505" y="1063" width="190" height="74" rx="3" fill="rgba(7,7,15,0.97)"/>
+        <foreignObject x="505" y="1063" width="190" height="74">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="tree-card clickable">
+            <div id="n00-tag" class="card-tag">编程 · 入门</div>
+            <div id="n00-title" class="card-title">freeCodeCamp</div>
+          </div>
+        </foreignObject>
+      </g>
 
       <!-- ── N01  cy=1000  card y=963-1037 ── -->
       <g onclick="window.open('https://github.com/microsoft/ML-For-Beginners','_blank')" style="cursor:pointer">
@@ -937,6 +948,7 @@ const UI_TEXT = {
   zh: {
     'tree-title':'学习树','legend-ml':'经典机器学习','legend-cv':'计算机视觉','legend-nlp':'NLP / 大模型',
     'tree-root-text':'基础准备 · Python / 线代 / 概率统计',
+    'n00-tag':'编程 · 入门','n00-title':'freeCodeCamp',
     'n01-tag':'ML · 入门','n01-title':'ML-For-Beginners',
     'n02-tag':'D2L · 预备','n02-title':'d2l 第1-2章 预备知识',
     'n03-tag':'D2L · 线性/MLP','n03-title':'d2l 第3-4章 线性/MLP',
@@ -962,6 +974,7 @@ const UI_TEXT = {
   en: {
     'tree-title':'Learning Tree','legend-ml':'Classic Machine Learning','legend-cv':'Computer Vision','legend-nlp':'NLP / Large Models',
     'tree-root-text':'Foundation · Python / Linear Algebra / Probability',
+    'n00-tag':'Coding · Intro','n00-title':'freeCodeCamp',
     'n01-tag':'ML · Intro','n01-title':'ML-For-Beginners',
     'n02-tag':'D2L · Prep','n02-title':'d2l Ch.1-2 Fundamentals',
     'n03-tag':'D2L · Linear/MLP','n03-title':'d2l Ch.3-4 Linear/MLP',
@@ -987,6 +1000,7 @@ const UI_TEXT = {
   ja: {
     'tree-title':'学習ツリー','legend-ml':'古典的機械学習','legend-cv':'コンピュータビジョン','legend-nlp':'NLP / 大規模モデル',
     'tree-root-text':'基礎準備・Python / 線形代数 / 確率統計',
+    'n00-tag':'プログラミング・入門','n00-title':'freeCodeCamp',
     'n01-tag':'ML・入門','n01-title':'ML-For-Beginners',
     'n02-tag':'D2L・予備','n02-title':'d2l 第1-2章 予備知識',
     'n03-tag':'D2L・線形/MLP','n03-title':'d2l 第3-4章 線形/MLP',
